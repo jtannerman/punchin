@@ -2,6 +2,7 @@
 
 {% block content %}
 
+
 {% for message in get_flashed_messages() %}
     <div class="alert alert-primary alert-dismissible fade show" role="alert">
         <strong>Holy guacamole!</strong> {{ message }}
@@ -26,7 +27,14 @@
         {{ form.email.label(class="form-label") }}
 
         {{ form.email(class="form-control") }}
-        <br/>
+
+        {% for field, errors in form.errors.items() %}
+        <small class="form-text text-muted ">
+            {{ ', '.join(errors) }}
+        </small>
+        {% endfor %}
+
+        <br/><br/>
         {{ form.submit(class="btn btn-primary") }}
 
     </form>

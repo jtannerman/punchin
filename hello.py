@@ -1,7 +1,7 @@
 from flask import Flask, render_template, flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Email
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -35,7 +35,7 @@ class NameForm(FlaskForm):
 
 class UserForm(FlaskForm):
     name = StringField("What is your name?", validators=[DataRequired()])
-    email = StringField("Email", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired(),Email()])
     submit = SubmitField("Submit")
 
 # create a route decorator
