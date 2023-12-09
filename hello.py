@@ -1,7 +1,7 @@
 from flask import Flask, render_template, flash, request
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired, Email
+from wtforms import StringField, SubmitField, PasswordField, BooleanField, ValidationError
+from wtforms.validators import DataRequired, Email, EqualTo, Length
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
@@ -66,10 +66,17 @@ class NameForm(FlaskForm):
     name = StringField("What is your name?", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
+class PasswordForm(FlaskForm):
+    email = StringField("What is your email?", validators=[DataRequired(),Email()])
+    password_hash = PasswordField("What is your password?", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
 class UserForm(FlaskForm):
     name = StringField("What is your name?", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(),Email()])
     fav_color = StringField("Favorite Color")
+    password_hash = PasswordField("Password", validators=[DataRequired(), EqualTo("password_hash2", message="Passwords Must Match!")])
+    password_hash2 = PasswordField("Confrim Password", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
 
@@ -96,13 +103,16 @@ def add_user():
     if form.validate_on_submit():
         user = Users.query.filter_by(email=form.email.data).first()
         if user is None:
-            user = Users(name=form.name.data, email=form.email.data, fav_color=form.fav_color.data)
+            #Hash the password
+            hashed_pw = generate_password_hash(form.password_hash.data, "pbkdf2")
+            user = Users(name=form.name.data, email=form.email.data, fav_color=form.fav_color.data, password_hash=hashed_pw)
             db.session.add(user)
             db.session.commit()
         name = form.name.data
         form.name.data = ''
         form.email.data = ''
         form.fav_color.data = ''
+        form.password_hash = ''
         flash("User added successfully!")
     our_users = Users.query.order_by(Users.date_added)
     return render_template("add_user.html",
@@ -170,6 +180,35 @@ def name():
 
     return render_template('name.html',
                            name = name,
+                           form = form)
+
+@app.route('/test_pw', methods=['GET', 'POST'])
+def test_pw():
+    email = None
+    password = None
+    pw_to_check = None
+    passed = None
+    form = PasswordForm()
+    #Validate Form
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password_hash.data
+        form.email.data = ''
+        form.password_hash.data = ''
+
+        pw_to_check = Users.query.filter_by(email=email).first()
+        # Check hashed password
+        passed = check_password_hash(pw_to_check.password_hash, password)
+
+
+
+        #flash("Form Submitted Successfully!")
+
+    return render_template('test_pw.html',
+                           email = email,
+                           password = password,
+                           pw_to_check = pw_to_check,
+                           passed = passed,
                            form = form)
 
 # Create custom error pages
