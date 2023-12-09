@@ -24,6 +24,10 @@
 
         {{ form.name(class="form-control", value=user_to_update.name) }}
 
+        {{ form.fav_color.label(class="form-label") }}
+
+        {{ form.fav_color(class="form-control", value=user_to_update.fav_color) }}
+
         {{ form.email.label(class="form-label") }}
 
         {{ form.email(class="form-control", value=user_to_update.email) }}
@@ -36,11 +40,12 @@
 
         <br/><br/>
         {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('delete', id=id) }}" class="btn btn-danger">Delete</a>
 
     </form>
 <br/><br/>
 {% for our_user in our_users %}
-    {{our_user.id}} . {{our_user.name }} - {{our_user.email}}<br/>
+    {{our_user.id}} . {{our_user.name }} - {{our_user.email}} - {{ our_user.fav_color }}<br/>
 {% endfor %}
 
 {% endif %}
