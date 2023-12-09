@@ -41,7 +41,7 @@ class Punches(db.Model):
 
     # Create a String
     def __repr__(self):
-        return '<Punches %r>' % self.user_id
+        return '<Punches %r>' % self.id
 
 # Create a form class
 class NameForm(FlaskForm):
