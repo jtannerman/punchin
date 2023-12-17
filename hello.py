@@ -206,7 +206,7 @@ def test_pw():
 
     return render_template('test_pw.html',
                            email = email,
-                           password = password,
+                           password = "Fuck You!",
                            pw_to_check = pw_to_check,
                            passed = passed,
                            form = form)
